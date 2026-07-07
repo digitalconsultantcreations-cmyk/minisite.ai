@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniSite AI — Instant Mini-Sites for Local Business</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E2A28;
+    --surface:#123934;
+    --surface-2:#164039;
+    --paper:#F7F3E8;
+    --coral:#FF6B4A;
+    --gold:#F2B705;
+    --steel:#8FA6A3;
+    --line: rgba(247,243,232,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Space Grotesk',sans-serif;
+    letter-spacing:-0.01em;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+
+  /* ---------- shell ---------- */
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 28px;border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .mark{
+    width:26px;height:26px;border-radius:6px;
+    background:linear-gradient(135deg,var(--coral),var(--gold));
+    flex-shrink:0;
+  }
+  .brand .name{font-family:'Space Grotesk';font-weight:600;font-size:15px;}
+  .brand .name span{color:var(--steel);font-weight:400;}
+  nav.top-nav{display:flex;gap:26px;font-size:13px;color:var(--steel);}
+  nav.top-nav a{text-decoration:none;}
+  nav.top-nav a:hover{color:var(--paper);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    display:grid;grid-template-columns:1fr 1fr;gap:56px;
+    padding:64px 0 40px;align-items:center;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono';font-size:12px;letter-spacing:0.12em;
+    color:var(--gold);text-transform:uppercase;margin-bottom:16px;
+  }
+  h1.hero-title{
+    font-size:44px;line-height:1.05;font-weight:700;margin:0 0 18px;
+  }
+  h1.hero-title em{
+    font-style:normal;color:var(--coral);
+  }
+  .hero-sub{
+    font-size:16px;line-height:1.55;color:var(--steel);max-width:46ch;margin:0 0 26px;
+  }
+  .hero-cta{display:flex;gap:12px;align-items:center;}
+  .btn{
+    font-family:'Space Grotesk';font-weight:600;font-size:14px;
+    padding:13px 22px;border-radius:9px;border:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:transform .15s ease, opacity .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--coral);color:var(--ink);}
+  .btn-primary:hover{opacity:0.92;}
+  .btn-ghost{background:transparent;color:var(--paper);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--paper);}
+
+  /* ---------- builder ---------- */
+  .builder{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:22px;display:grid;gap:14px;
+  }
+  .field label{
+    display:block;font-family:'IBM Plex Mono';font-size:11px;color:var(--steel);
+    text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+    border-radius:8px;padding:10px 12px;font-family:'Inter';font-size:14px;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none;border-color:var(--coral);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .swatches{display:flex;gap:8px;margin-top:2px;}
+  .swatch{
+    width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;
+  }
+  .swatch.active{border-color:var(--paper);}
+  .gen-status{font-family:'IBM Plex Mono';font-size:12px;color:var(--gold);min-height:16px;}
+
+  /* ---------- preview frame (signature element) ---------- */
+  .preview-shell{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    overflow:hidden;
+  }
+  .chrome{
+    display:flex;align-items:center;gap:8px;padding:12px 14px;
+    background:var(--surface-2);border-bottom:1px solid var(--line);
+  }
+  .chrome .dot{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .chrome .url{
+    margin-left:8px;font-family:'IBM Plex Mono';font-size:11px;color:var(--steel);
+    background:var(--ink);border-radius:6px;padding:4px 10px;flex:1;
+  }
+  #siteFrame{
+    background:#fff;color:#111;min-height:520px;padding:0;
+    font-family:'Inter',sans-serif;
+  }
+  .site-empty{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:520px;color:#98a3a1;text-align:center;padding:40px;
+    font-family:'IBM Plex Mono';font-size:13px;
+  }
+  .site-hero{padding:52px 34px 40px;text-align:center;}
+  .site-hero h2{font-family:'Space Grotesk';font-size:30px;margin:0 0 10px;line-height:1.15;}
+  .site-hero p{font-size:15px;color:#5a6664;max-width:44ch;margin:0 auto 20px;}
+  .site-hero .cta{
+    display:inline-block;padding:12px 24px;border-radius:8px;font-weight:600;
+    font-family:'Space Grotesk';font-size:14px;
+  }
+  .site-about{padding:36px 34px;border-top:1px solid #eee;}
+  .site-about h3{font-family:'Space Grotesk';font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:#98a3a1;margin:0 0 10px;}
+  .site-about p{font-size:15px;line-height:1.6;color:#333;margin:0;}
+  .site-services{padding:36px 34px;border-top:1px solid #eee;display:grid;gap:16px;}
+  .site-services h3{font-family:'Space Grotesk';font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:#98a3a1;margin:0 0 4px;}
+  .svc-item{border-left:3px solid; padding-left:14px;}
+  .svc-item h4{font-family:'Space Grotesk';font-size:16px;margin:0 0 4px;}
+  .svc-item p{font-size:14px;color:#555;margin:0;}
+  .site-quote{padding:30px 34px;border-top:1px solid #eee;font-style:italic;color:#444;font-size:15px;}
+  .site-footer{padding:26px 34px;border-top:1px solid #eee;font-family:'IBM Plex Mono';font-size:12px;color:#8a938f;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+  /* ---------- sections ---------- */
+  section{padding:70px 0;border-top:1px solid var(--line);}
+  .section-head{max-width:60ch;margin:0 0 40px;}
+  .section-head .eyebrow{margin-bottom:10px;}
+  .section-head h2{font-size:28px;margin:0 0 10px;}
+  .section-head p{color:var(--steel);font-size:15px;line-height:1.6;margin:0;}
+
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .feature{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;
+  }
+  .feature .tag{font-family:'IBM Plex Mono';font-size:11px;color:var(--gold);margin-bottom:12px;}
+  .feature h3{font-size:17px;margin:0 0 8px;}
+  .feature p{font-size:14px;color:var(--steel);line-height:1.55;margin:0;}
+
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .tier{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px;
+    display:flex;flex-direction:column;gap:16px;
+  }
+  .tier.featured{border-color:var(--coral);position:relative;}
+  .tier.featured::before{
+    content:"MOST POPULAR";position:absolute;top:-11px;left:24px;
+    background:var(--coral);color:var(--ink);font-family:'IBM Plex Mono';font-size:10px;
+    padding:4px 10px;border-radius:20px;letter-spacing:0.05em;
+  }
+  .tier .tname{font-family:'IBM Plex Mono';font-size:12px;color:var(--steel);text-transform:uppercase;letter-spacing:0.08em;}
+  .tier .tprice{font-family:'Space Grotesk';font-size:36px;font-weight:700;}
+  .tier .tprice span{font-size:14px;color:var(--steel);font-weight:400;}
+  .tier ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:var(--paper);}
+  .tier ul li{padding-left:18px;position:relative;}
+  .tier ul li::before{content:"→";position:absolute;left:0;color:var(--gold);}
+  .tier .btn{width:100%;justify-content:center;margin-top:auto;}
+
+  footer.site-end{
+    padding:36px 0 50px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    font-family:'IBM Plex Mono';font-size:12px;color:var(--steel);
+  }
+
+  @media(max-width:880px){
+    .hero{grid-template-columns:1fr;}
+    .row2, .feature-grid, .tiers{grid-template-columns:1fr;}
+    h1.hero-title{font-size:32px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="mark"></div>
+    <div class="name">MiniSite AI <span>by Digital Consultant Creations</span></div>
+  </div>
+  <nav class="top-nav">
+    <a href="#builder">Try it</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO + LIVE BUILDER -->
+  <section class="hero" id="builder" style="border-top:none;">
+    <div>
+      <div class="eyebrow">No course. No templates to fill in. Just a tool.</div>
+      <h1 class="hero-title">Give it a business name.<br>Get a <em>live mini-site</em> in 30 seconds.</h1>
+      <p class="hero-sub">MiniSite AI writes and builds a complete one-page site — hero, about, services, testimonial, call to action — for any salon, restaurant, coach, or clinic. No copywriting, no design decisions, no course to finish first.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="document.getElementById('bizName').focus()">Generate a site now ↓</button>
+        <a class="btn btn-ghost" href="#pricing">See pricing</a>
+      </div>
+    </div>
+
+    <div class="builder">
+      <div class="field">
+        <label>Business name</label>
+        <input id="bizName" placeholder="e.g. Island Glow Salon" value="Island Glow Salon">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Business type</label>
+          <select id="bizType">
+            <option>Hair & beauty salon</option>
+            <option>Restaurant / takeout</option>
+            <option>Fitness / wellness coach</option>
+            <option>Medical or dental office</option>
+            <option>Auto repair shop</option>
+            <option>Event / catering service</option>
+            <option>Other local service business</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input id="bizLoc" placeholder="e.g. Port of Spain, Trinidad" value="Port of Spain, Trinidad">
+        </div>
+      </div>
+      <div class="field">
+        <label>What makes them worth choosing? (2-3 things)</label>
+        <textarea id="bizPoints" rows="2" placeholder="e.g. 12 years experience, walk-ins welcome, evening slots">12 years experience, walk-ins welcome, evening appointments available</textarea>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Tone</label>
+          <select id="bizTone">
+            <option>Warm & welcoming</option>
+            <option>Premium & polished</option>
+            <option>Bold & energetic</option>
+            <option>Calm & reassuring</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Accent color</label>
+          <div class="swatches" id="swatches">
+            <div class="swatch active" style="background:#FF6B4A" data-color="#FF6B4A"></div>
+            <div class="swatch" style="background:#2A8C82" data-color="#2A8C82"></div>
+            <div class="swatch" style="background:#F2B705" data-color="#F2B705"></div>
+            <div class="swatch" style="background:#5B6EF5" data-color="#5B6EF5"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="genBtn" onclick="generateSite()">Generate mini-site</button>
+      <div class="gen-status" id="genStatus"></div>
+    </div>
+  </section>
+
+  <!-- PREVIEW -->
+  <section style="padding-top:0;border-top:none;">
+    <div class="preview-shell">
+      <div class="chrome">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <div class="url" id="urlBar">yourbusiness.com</div>
+      </div>
+      <div id="siteFrame">
+        <div class="site-empty">Fill in the details above and hit "Generate mini-site."<br>Your live preview will render here.</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+      <button class="btn btn-ghost" id="downloadBtn" style="display:none;" onclick="downloadSite()">Download this site as HTML ↓</button>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">Why a tool, not a course</div>
+      <h2>Courses teach the work. This does the work.</h2>
+      <p>Most "mini-site" products sell you hours of video on how to write copy and pick templates. MiniSite AI skips the lesson and hands you the finished, working site — so you can sell websites to local businesses without becoming a copywriter or designer first.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="tag mono">01 — INPUT</div>
+        <h3>Five fields, not fifty</h3>
+        <p>Business name, type, location, what makes them worth choosing, and a tone. That's the entire brief.</p>
+      </div>
+      <div class="feature">
+        <div class="tag mono">02 — GENERATE</div>
+        <h3>Full copy, written for them</h3>
+        <p>Headline, about section, services, a sample testimonial slot, and a call to action — written specifically for that business, not a generic fill-in-the-blank.</p>
+      </div>
+      <div class="feature">
+        <div class="tag mono">03 — DELIVER</div>
+        <h3>Download and hand it over</h3>
+        <p>Export a clean, standalone HTML file. Deploy it yourself on Vercel or GitHub Pages, or hand it to the client to host anywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="section-head">
+      <div class="eyebrow">Pricing</div>
+      <h2>Priced for what it replaces — not what it costs to run.</h2>
+      <p>One mini-site sold to a local business typically runs $150-$500+ TTD as a one-off project. MiniSite AI lets you produce that in minutes, repeatedly.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <div class="tname mono">Starter</div>
+        <div class="tprice">$97 <span>one-time</span></div>
+        <ul>
+          <li>Generate up to 10 mini-sites</li>
+          <li>HTML export, unlimited edits</li>
+          <li>4 accent color themes</li>
+          <li>Email support</li>
+        </ul>
+        <a class="btn btn-ghost" href="mailto:digitalconsultantcreations@gmail.com?subject=MiniSite%20AI%20-%20Starter">Get Starter</a>
+      </div>
+      <div class="tier featured">
+        <div class="tname mono">Operator</div>
+        <div class="tprice">$197 <span>one-time</span></div>
+        <ul>
+          <li>Unlimited mini-site generation</li>
+          <li>HTML export + copy-only export</li>
+          <li>Full color & tone customization</li>
+          <li>Resell rights to your own clients</li>
+          <li>WhatsApp priority support</li>
+        </ul>
+        <a class="btn btn-primary" href="mailto:digitalconsultantcreations@gmail.com?subject=MiniSite%20AI%20-%20Operator">Get Operator</a>
+      </div>
+      <div class="tier">
+        <div class="tname mono">Agency</div>
+        <div class="tprice">$497 <span>one-time</span></div>
+        <ul>
+          <li>Everything in Operator</li>
+          <li>White-label under your own brand</li>
+          <li>Bulk generation for multiple clients</li>
+          <li>1-on-1 onboarding call</li>
+        </ul>
+        <a class="btn btn-ghost" href="mailto:digitalconsultantcreations@gmail.com?subject=MiniSite%20AI%20-%20Agency">Get Agency</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-end" id="contact">
+    <div>Digital Consultant Creations · Trinidad & Tobago</div>
+    <div>WhatsApp 868-783-5344 · digitalconsultantcreations@gmail.com</div>
+  </footer>
+
+</div>
+
+<script>
+let currentSite = null;
+let currentColor = "#FF6B4A";
+
+document.querySelectorAll('.swatch').forEach(sw=>{
+  sw.addEventListener('click', ()=>{
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    currentColor = sw.dataset.color;
+    if(currentSite) renderSite(currentSite, currentColor);
+  });
+});
+
+function slugUrl(name){
+  return (name||"yourbusiness").toLowerCase().replace(/[^a-z0-9]+/g,'') + ".com";
+}
+
+async function generateSite(){
+  const name = document.getElementById('bizName').value.trim() || "Your Business";
+  const type = document.getElementById('bizType').value;
+  const loc = document.getElementById('bizLoc').value.trim() || "your area";
+  const points = document.getElementById('bizPoints').value.trim() || "quality service, friendly staff";
+  const tone = document.getElementById('bizTone').value;
+  const btn = document.getElementById('genBtn');
+  const status = document.getElementById('genStatus');
+
+  btn.disabled = true;
+  status.textContent = "Writing site copy…";
+  document.getElementById('urlBar').textContent = slugUrl(name);
+
+  const prompt = `You are writing copy for a one-page mini-site for a local business.
+Business name: ${name}
+Business type: ${type}
+Location: ${loc}
+Key selling points: ${points}
+Tone: ${tone}
+
+Return ONLY raw JSON (no markdown fences, no preamble) matching exactly this shape:
+{
+  "headline": "short punchy headline, under 9 words",
+  "subheadline": "one supporting sentence, under 20 words",
+  "ctaText": "2-4 word button label",
+  "about": "2-3 sentences about the business, written in third person, natural and specific to the business type and location",
+  "services": [
+    {"name":"service name","desc":"one short sentence"},
+    {"name":"service name","desc":"one short sentence"},
+    {"name":"service name","desc":"one short sentence"}
+  ],
+  "testimonial": "one short sample testimonial sentence, first person, marked clearly as an example a client could later replace",
+  "testimonialAuthor": "a plausible local first name only",
+  "footerTagline": "under 8 words, warm sign-off"
+}`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const textBlocks = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+    const clean = textBlocks.replace(/```json|```/g,"").trim();
+    const site = JSON.parse(clean);
+    currentSite = site;
+    renderSite(site, currentColor);
+    document.getElementById('downloadBtn').style.display = "inline-flex";
+    status.textContent = "Done — scroll down to preview, or download below.";
+  }catch(err){
+    console.error(err);
+    status.textContent = "Something went wrong generating the site. Try again.";
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function renderSite(site, color){
+  const frame = document.getElementById('siteFrame');
+  frame.innerHTML = `
+    <div class="site-hero">
+      <h2>${escapeHtml(site.headline)}</h2>
+      <p>${escapeHtml(site.subheadline)}</p>
+      <span class="cta" style="background:${color};color:#111;">${escapeHtml(site.ctaText)}</span>
+    </div>
+    <div class="site-about">
+      <h3>About</h3>
+      <p>${escapeHtml(site.about)}</p>
+    </div>
+    <div class="site-services">
+      <h3>Services</h3>
+      ${site.services.map(s=>`<div class="svc-item" style="border-color:${color};"><h4>${escapeHtml(s.name)}</h4><p>${escapeHtml(s.desc)}</p></div>`).join("")}
+    </div>
+    <div class="site-quote">"${escapeHtml(site.testimonial)}" <span style="color:#999;">— ${escapeHtml(site.testimonialAuthor)} (sample)</span></div>
+    <div class="site-footer">
+      <span>${escapeHtml(site.footerTagline)}</span>
+      <span>Built with MiniSite AI</span>
+    </div>
+  `;
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str==null ? "" : str;
+  return d.innerHTML;
+}
+
+function downloadSite(){
+  if(!currentSite) return;
+  const name = document.getElementById('bizName').value.trim() || "Your Business";
+  const site = currentSite;
+  const color = currentColor;
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(name)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;color:#222;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;}
+  .hero{padding:80px 24px 60px;text-align:center;background:#fafafa;}
+  .hero h1{font-size:36px;margin:0 0 14px;}
+  .hero p{font-size:17px;color:#555;max-width:520px;margin:0 auto 26px;}
+  .cta{display:inline-block;padding:14px 30px;border-radius:8px;font-weight:600;background:${color};color:#111;text-decoration:none;}
+  .section{max-width:760px;margin:0 auto;padding:50px 24px;border-top:1px solid #eee;}
+  .section h2{font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:#999;margin:0 0 16px;}
+  .svc{border-left:3px solid ${color};padding-left:16px;margin-bottom:20px;}
+  .svc h3{font-size:18px;margin:0 0 6px;}
+  .quote{font-style:italic;color:#444;font-size:16px;}
+  footer{max-width:760px;margin:0 auto;padding:30px 24px;border-top:1px solid #eee;color:#999;font-size:13px;}
+</style>
+</head>
+<body>
+  <div class="hero">
+    <h1>${escapeHtml(site.headline)}</h1>
+    <p>${escapeHtml(site.subheadline)}</p>
+    <a class="cta" href="#contact">${escapeHtml(site.ctaText)}</a>
+  </div>
+  <div class="section">
+    <h2>About</h2>
+    <p>${escapeHtml(site.about)}</p>
+  </div>
+  <div class="section">
+    <h2>Services</h2>
+    ${site.services.map(s=>`<div class="svc"><h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.desc)}</p></div>`).join("")}
+  </div>
+  <div class="section">
+    <p class="quote">"${escapeHtml(site.testimonial)}" — ${escapeHtml(site.testimonialAuthor)} <em>(sample — replace with a real client quote)</em></p>
+  </div>
+  <footer id="contact">${escapeHtml(site.footerTagline)} · Replace this footer with your real contact details.</footer>
+</body>
+</html>`;
+  const blob = new Blob([html], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = slugUrl(name).replace('.com','') + "-minisite.html";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
