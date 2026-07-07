@@ -424,14 +424,13 @@ Return ONLY raw JSON (no markdown fences, no preamble) matching exactly this sha
 }`;
 
   try{
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    // Calls your own backend function (api/generate.js), which holds the real
+    // Anthropic API key server-side. This only works once deployed on Vercel
+    // with ANTHROPIC_API_KEY set as an environment variable.
+    const response = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: prompt }]
-      })
+      body: JSON.stringify({ prompt })
     });
     const data = await response.json();
     const textBlocks = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
@@ -534,6 +533,12 @@ function downloadSite(){
   a.download = slugUrl(name).replace('.com','') + "-minisite.html";
   a.click();
   URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
+
 }
 </script>
 
